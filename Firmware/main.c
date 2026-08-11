@@ -63,6 +63,16 @@ void spi_callback(uint8_t *data){
         case SPI_CMD_SET_HOSTNAME:
             strcpy(display_struct.ip, (char*)&data[1]);
             break;
+        case SPI_CMD_SET_PID: // Better this than doing magic with floats on the other side
+            {
+                float kp = (uint16_t)((data[1] << 8) | data[2]) / 1000.0;
+                float ki = (uint16_t)((data[3] << 8) | data[4]) / 1000.0;
+                float kd = (uint16_t)((data[5] << 8) | data[6]) / 1000.0;
+                // Seems like nothing wrong should happen when you call init again
+                speed_controller_init(kp, ki, kd);
+            }
+            break;
+
     }
 }
 
