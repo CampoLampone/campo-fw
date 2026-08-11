@@ -4,8 +4,8 @@ typedef struct {
     float ki;
     float kd;
 
-    // float integral_min;
-    // float integral_max;
+    float integral_min;
+    float integral_max;
 
     float prev_error;
     float integral;

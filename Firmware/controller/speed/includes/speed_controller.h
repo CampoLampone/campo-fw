@@ -11,7 +11,7 @@
 #define PULSES_PER_WHEEL_ROTATION (PULSES_PER_MOTOR_ROTATION * GEARBOX_RATIO)
 
 #define PID_TO_PWM_SCALE 256
-// #define PID_I_MAX 256       // TODO: **Magic value** (find working number)
+#define PID_I_MAX 25000.0f
 
 #define PWM_MAX 0xFFFF
 
@@ -21,6 +21,7 @@
 void compute_encoders_rpm(float delta_ms);
 void speed_controller_init(float kp, float ki, float kd);
 void reset_emergency_stop();
+int clamp_pid_to_pwm(float val);
 void clear_pid_cache();
 void control_speed(int16_t target_speed[MOTOR_COUNT], float delta_ms);
 float get_rpm(uint8_t side);

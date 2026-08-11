@@ -44,16 +44,16 @@ void compute_encoders_rpm(float delta_ms){
     }
 }
 
-int clamp_pid_to_pwm(int val) {
-    val = val * PID_TO_PWM_SCALE;
-    if (val < -PWM_MAX) return -PWM_MAX;
-    if (val > PWM_MAX) return PWM_MAX;
-    return val;
+int clamp_pid_to_pwm(float val) {
+    int val_int = (int)(val * PID_TO_PWM_SCALE);
+    if (val_int < -PWM_MAX) return -PWM_MAX;
+    if (val_int > PWM_MAX) return PWM_MAX;
+    return val_int;
 }
 
 void control_motor_speed(int16_t target_speed, uint8_t side, float delta_ms){
     motors_pid[side].measured_value = lpf_apply(&lp_filter[side], measured_rpm[side]);
-    motors_pid[side].dt = delta_ms;
+    motors_pid[side].dt = delta_ms / 1000.0f;
     motors_pid[side].setpoint = target_speed;
     pid_compute(&motors_pid[side]);
     motor_set_pwm(side, emergencyStopFlag ? 0 : clamp_pid_to_pwm(motors_pid[side].output));
@@ -91,8 +91,8 @@ void speed_controller_init(float kp, float ki, float kd) {
         motors_pid[motor].ki = ki;
         motors_pid[motor].kd = kd;
         lpf_init(&lp_filter[motor], 2.0f, 0.01f);
-        // motors_pid[motor].integral_max = PID_I_MAX;
-        // motors_pid[motor].integral_min = -PID_I_MAX;
+        motors_pid[motor].integral_max = PID_I_MAX;
+        motors_pid[motor].integral_min = -PID_I_MAX;
     }
 }
 
