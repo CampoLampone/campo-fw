@@ -1,0 +1,5 @@
+CompileFlags:
+    Add: [-I$HOME/esp/esp-idf, -I$HOME/esp/esp-idf/components]
+    Remove: [-fno-shrink-wrap, -fstrict-volatile-bitfields, -fno-tree-switch-conversion, -mlongcalls]
+Diagnostics:
+  Suppress: pp_file_not_found
