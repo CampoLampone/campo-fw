@@ -11,6 +11,7 @@
 #include "config.h"
 #include "spi.h"
 #include "spi_cmds.h"
+#include "ws2812.h"
 
 #if TEST_MODE > 0
 #include "tests.h"
@@ -72,6 +73,12 @@ void spi_callback(uint8_t *data){
                 speed_controller_init(kp, ki, kd);
             }
             break;
+        case SPI_CMD_SET_RGB_VALUE:
+            {
+                uint32_t rgb = (data[1] << 16) | (data[2] << 8) | data[3];
+                ws2812_put_color(rgb);
+            }
+            break;
 
     }
 }
@@ -89,6 +96,8 @@ int main() {
     reset_emergency_stop();
     i2c_init(i2c_default, 400 * 1000);
     ssd1306_gpio_init(PICO_DEFAULT_I2C_SDA_PIN, PICO_DEFAULT_I2C_SCL_PIN);
+    ws2812_init(1);
+    ws2812_put_color(0x000000); // Set it black
 
     ssd1306_t disp;
     disp.external_vcc=false;

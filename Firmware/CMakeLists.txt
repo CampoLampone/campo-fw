@@ -18,6 +18,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 add_subdirectory(driver)
 add_subdirectory(controller)
 
-target_link_libraries(${PROJECT_NAME} pico_stdlib pico_stdio_usb driver_display driver_motor driver_encoder controller_pid controller_speed driver_spi)
+target_link_libraries(${PROJECT_NAME} pico_stdlib pico_stdio_usb driver_display driver_motor driver_encoder controller_pid controller_speed driver_spi ws2812)
 
 pico_add_extra_outputs(${PROJECT_NAME})
