@@ -12,7 +12,7 @@
 
 uint8_t buffer[BUF_SIZE];
 
-PIO pio = pio1;
+static PIO pio = pio1;
 uint read_data_sm;
 int dma_chan;
 dma_channel_config c;
