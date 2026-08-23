@@ -34,13 +34,13 @@ static void stream_task(void *pvParameters) {
             break;
         }
 
-        size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, len);
-        res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
+        res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
         if(res == ESP_OK){
-            res = httpd_resp_send_chunk(req, (const char *)buf, len);
+            size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, len);
+            res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
         }
         if(res == ESP_OK){
-            res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
+            res = httpd_resp_send_chunk(req, (const char *)buf, len);
         }
 
         camera_release_frame(handle);

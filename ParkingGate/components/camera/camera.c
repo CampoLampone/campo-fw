@@ -56,7 +56,7 @@ static camera_config_t camera_config = {
     .frame_size = full_frame_settings.frame_size,
     .jpeg_quality = full_frame_settings.quality,
     .fb_count = 4,
-    .grab_mode = CAMERA_GRAB_WHEN_EMPTY//CAMERA_GRAB_LATEST. Sets when buffers should be filled
+    .grab_mode = CAMERA_GRAB_LATEST
 };
 
 void camera_set_frame_settings(const struct camera_frame_settings *settings) {
