@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "leds.h"
 #include "gates.h"
+#include "fan.h"
 #include "server.h"
 #include "network.h"
 #include "freertos/FreeRTOS.h"
@@ -17,6 +18,7 @@ void app_main() {
     camera_init();
     leds_init();
     gates_init();
+    fan_init();
     server_start();
 
     while(true){
