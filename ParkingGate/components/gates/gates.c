@@ -10,8 +10,13 @@ static const char *TAG = "Gates";
 // 1.0ms pulse (0 deg) = 1.0 / 20.0 * 16384 = 819
 // 2.0ms pulse (90 deg) = 2.0 / 20.0 * 16384 = 1638 (adjusting for cheap SG90s where 1.0ms delta = 90deg)
 
-#define SERVO_MIN_PULSEWIDTH 819
-#define SERVO_MAX_PULSEWIDTH 1638
+// Base values for 0 and 90 degrees
+#define BASE_MIN_PULSEWIDTH 819
+#define BASE_MAX_PULSEWIDTH 1638
+
+// Separate calibration offsets for each gate
+#define SERVO_IN_OFFSET_TICKS -0
+#define SERVO_OUT_OFFSET_TICKS -90
 
 esp_err_t gates_init(void) {
     ledc_timer_config_t ledc_timer = {
@@ -30,7 +35,7 @@ esp_err_t gates_init(void) {
         .timer_sel      = LEDC_TIMER_1,
         .intr_type      = LEDC_INTR_DISABLE,
         .gpio_num       = SERVO_IN_PIN,
-        .duty           = SERVO_MIN_PULSEWIDTH,
+        .duty           = BASE_MAX_PULSEWIDTH + SERVO_IN_OFFSET_TICKS, // Boot closed (which is MAX for IN gate)
         .hpoint         = 0
     };
     err = ledc_channel_config(&in_ch);
@@ -42,7 +47,7 @@ esp_err_t gates_init(void) {
         .timer_sel      = LEDC_TIMER_1,
         .intr_type      = LEDC_INTR_DISABLE,
         .gpio_num       = SERVO_OUT_PIN,
-        .duty           = SERVO_MIN_PULSEWIDTH,
+        .duty           = BASE_MAX_PULSEWIDTH + SERVO_OUT_OFFSET_TICKS, // Boot closed (which is MAX for OUT gate)
         .hpoint         = 0
     };
     err = ledc_channel_config(&out_ch);
@@ -56,14 +61,18 @@ esp_err_t gates_init(void) {
 }
 
 void gate_in_set(bool open) {
-    uint32_t duty = open ? SERVO_MAX_PULSEWIDTH : SERVO_MIN_PULSEWIDTH;
+    uint32_t min_pulse = BASE_MIN_PULSEWIDTH + SERVO_IN_OFFSET_TICKS;
+    uint32_t max_pulse = BASE_MAX_PULSEWIDTH + SERVO_IN_OFFSET_TICKS;
+    uint32_t duty = open ? min_pulse : max_pulse;
     ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, duty, 1500); // 1.5 seconds smooth sweep
     ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, LEDC_FADE_NO_WAIT);
     ESP_LOGI(TAG, "Gate IN set to %s (smooth)", open ? "OPEN" : "CLOSE");
 }
 
 void gate_out_set(bool open) {
-    uint32_t duty = open ? SERVO_MAX_PULSEWIDTH : SERVO_MIN_PULSEWIDTH;
+    uint32_t min_pulse = BASE_MIN_PULSEWIDTH + SERVO_OUT_OFFSET_TICKS;
+    uint32_t max_pulse = BASE_MAX_PULSEWIDTH + SERVO_OUT_OFFSET_TICKS;
+    uint32_t duty = open ? min_pulse : max_pulse;
     ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_2, duty, 1500); // 1.5 seconds smooth sweep
     ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_2, LEDC_FADE_NO_WAIT);
     ESP_LOGI(TAG, "Gate OUT set to %s (smooth)", open ? "OPEN" : "CLOSE");
